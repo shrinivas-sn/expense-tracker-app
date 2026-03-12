@@ -20,7 +20,7 @@ import { showConfirm } from "./ui/confirm-modal.js";
 import { loginUser, signupUser, logoutUser, onAuthChange } from "./services/auth-service.js";
 
 // --- SECURITY CONFIG ---
-const ALLOWED_USERS = ['01fe20bec241@kletech.ac.in'];
+const ALLOWED_USERS = ['your.email@example.com'];
 
 /**
  * Application state management

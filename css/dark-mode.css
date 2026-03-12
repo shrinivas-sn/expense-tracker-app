@@ -1,0 +1,477 @@
+/**
+ * Dark Mode Overrides
+ * All dark theme styles
+ */
+
+/* Dark Mode Variables */
+[data-theme="dark"] {
+    --primary: #3b82f6;
+    --bg-body: #0f172a;
+    --bg-white: #1e293b;
+    --profit: #22c55e;
+    --profit-bg: #14532d;
+    --loss: #ef4444;
+    --loss-bg: #7f1d1d;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #334155;
+}
+
+[data-theme="dark"] body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+}
+
+/* Cards & Containers */
+[data-theme="dark"] .portfolio-card,
+[data-theme="dark"] .list-item-row,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .search-filter-container,
+[data-theme="dark"] .personal-balance-card {
+    background: var(--bg-white);
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+/* MF Card Background Fix */
+[data-theme="dark"] .mf-card-bg {
+    background: var(--bg-white);
+}
+
+/* Form Inputs */
+[data-theme="dark"] .form-input,
+[data-theme="dark"] .search-input {
+    background: #0f172a;
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .form-input:focus,
+[data-theme="dark"] .search-input:focus {
+    border-color: var(--primary);
+    background: #1e293b;
+}
+
+[data-theme="dark"] .form-input::placeholder,
+[data-theme="dark"] .search-input::placeholder {
+    color: var(--text-muted);
+}
+
+/* WALLET AMOUNT FIELD FIX (Crucial for Dark Mode) */
+[data-theme="dark"] .amount-field {
+    background: transparent;
+    color: var(--text-main);
+    border-bottom-color: var(--border);
+}
+
+[data-theme="dark"] .amount-field::placeholder {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .currency-symbol {
+    color: var(--text-main);
+}
+
+/* Header & Nav */
+[data-theme="dark"] .app-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+[data-theme="dark"] .bottom-nav {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .nav-item {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .nav-item.active {
+    color: var(--primary);
+}
+
+/* Sidebar */
+[data-theme="dark"] #side-menu {
+    background: var(--bg-white);
+}
+
+[data-theme="dark"] .menu-header {
+    background: #1e293b;
+    border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .menu-btn:active {
+    background-color: var(--bg-body);
+}
+
+[data-theme="dark"] .menu-label {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .menu-desc {
+    color: var(--text-muted);
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-cancel {
+    color: var(--text-muted);
+}
+
+/* EDIT BUTTON FIX */
+[data-theme="dark"] .btn-neutral {
+    background-color: #334155;
+    color: var(--text-main);
+    border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .btn-neutral:hover {
+    background-color: #475569;
+}
+
+/* Icons */
+[data-theme="dark"] .btn-icon {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-icon-sm {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-icon-sm:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .btn-icon-sm.text-loss {
+    color: var(--loss);
+}
+
+[data-theme="dark"] .btn-icon-sm.text-loss:hover {
+    background-color: var(--loss-bg);
+    color: var(--loss);
+}
+
+[data-theme="dark"] .btn-icon-sm.text-neutral {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .btn-icon-sm.text-neutral:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+}
+
+/* Detail Actions Bar */
+[data-theme="dark"] .detail-actions-bar {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+
+/* Portfolio Cards Text - CRITICAL FIX */
+[data-theme="dark"] .portfolio-card .label-sm,
+[data-theme="dark"] .portfolio-card .label-xs,
+[data-theme="dark"] .portfolio-card .amount-lg,
+[data-theme="dark"] .portfolio-card .pnl-val,
+[data-theme="dark"] .portfolio-card .invested-row {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .label-sm,
+[data-theme="dark"] .label-xs {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .amount-lg {
+    color: var(--text-main);
+}
+
+/* List Items Text */
+[data-theme="dark"] .item-name {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .item-sub {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .item-price {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .item-stat.text-neutral {
+    color: var(--text-muted);
+}
+
+/* List Header */
+[data-theme="dark"] .list-header {
+    color: var(--text-muted);
+}
+
+/* Detail View - CRITICAL FIX */
+[data-theme="dark"] .detail-header-card {
+    background: var(--bg-white);
+    color: var(--text-main);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .detail-ticker,
+[data-theme="dark"] .detail-price {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .stat-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .stat-val {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .history-list {
+    background: transparent;
+}
+
+[data-theme="dark"] .history-item {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+
+/* Modals Headers */
+[data-theme="dark"] .header-neutral {
+    background: var(--bg-white);
+    color: var(--text-main);
+    border-bottom: 1px solid var(--border);
+}
+
+[data-theme="dark"] .header-expense {
+    background: var(--loss-bg);
+    color: var(--loss);
+}
+
+[data-theme="dark"] .type-toggle-container {
+    background: var(--bg-body);
+}
+
+[data-theme="dark"] .type-btn {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .type-btn.active {
+    background: var(--bg-white);
+    color: var(--text-main);
+}
+
+/* Input Labels */
+[data-theme="dark"] .input-label {
+    color: var(--text-muted);
+}
+
+/* Radio Labels */
+[data-theme="dark"] .radio-label {
+    color: var(--text-main);
+}
+
+/* Filter Buttons */
+[data-theme="dark"] .filter-btn {
+    background: var(--bg-body);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Sort Menu */
+[data-theme="dark"] .sort-btn {
+    background: var(--bg-body);
+    border-color: var(--border);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .sort-menu {
+    background: var(--bg-white);
+    border-color: var(--border);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .sort-menu button {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .sort-menu button:hover {
+    background: var(--bg-body);
+}
+
+/* Graph Styles */
+[data-theme="dark"] .graph-title {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .graph-subtitle {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .time-range-btn {
+    background: var(--bg-body);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .time-range-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+[data-theme="dark"] .time-range-btn:hover:not(.active) {
+    background: var(--bg-white);
+    color: var(--primary);
+}
+
+[data-theme="dark"] .graph-stats {
+    background: var(--bg-white);
+}
+
+[data-theme="dark"] .graph-stat-label {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .graph-stat-value {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .chart-wrapper {
+    background: var(--bg-white);
+}
+
+/* Empty State */
+[data-theme="dark"] .empty-state {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .empty-state-title {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] .empty-sub {
+    color: var(--text-muted);
+}
+
+/* FAB Button */
+[data-theme="dark"] .btn-fab {
+    background-color: var(--primary);
+    color: white;
+}
+
+/* Notification Toast */
+[data-theme="dark"] .notification-toast {
+    background: var(--bg-white);
+    border-left-color: var(--primary);
+}
+
+[data-theme="dark"] .toast-message {
+    color: var(--text-main);
+}
+
+/* Menu Buttons in Type Selector */
+[data-theme="dark"] .menu-btn-stocks,
+[data-theme="dark"] .menu-btn-mfs,
+[data-theme="dark"] .menu-btn-wallet {
+    background: var(--bg-body);
+}
+
+[data-theme="dark"] .menu-btn-stocks .menu-label,
+[data-theme="dark"] .menu-btn-mfs .menu-label,
+[data-theme="dark"] .menu-btn-wallet .menu-label {
+    color: var(--text-main);
+}
+
+/* Balance Card Text */
+[data-theme="dark"] .balance-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+[data-theme="dark"] .balance-value {
+    color: white;
+}
+
+[data-theme="dark"] #wallet-balance {
+    color: white;
+}
+
+/* Delete Button */
+[data-theme="dark"] .btn-delete {
+    background: var(--loss-bg);
+    color: var(--loss);
+}
+
+/* Search Icon */
+[data-theme="dark"] .search-icon {
+    color: var(--text-muted);
+}
+
+/* Clear Search Button */
+[data-theme="dark"] .clear-search {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .clear-search:hover {
+    background: var(--bg-body);
+}
+
+/* Bank Selector Elements */
+[data-theme="dark"] #selected-bank-name,
+[data-theme="dark"] #selected-bank-display,
+[data-theme="dark"] #total-deposits {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+[data-theme="dark"] #bank-list-container .menu-btn,
+[data-theme="dark"] #bank-accounts-list .list-item-row {
+    background: var(--bg-white);
+    color: var(--text-main);
+}
+
+[data-theme="dark"] #bank-accounts-list .item-name,
+[data-theme="dark"] #bank-accounts-list .item-price {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] #bank-accounts-list .item-sub {
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] #deposits-list > div {
+    background: var(--bg-body) !important;
+    color: var(--text-main);
+}
+
+[data-theme="dark"] #deposits-list p {
+    color: var(--text-main);
+}
+
+[data-theme="dark"] #deposits-list .item-sub {
+    color: var(--text-muted) !important;
+}
+
+/* Ensure deposit amounts show in green */
+[data-theme="dark"] #deposits-list .text-profit,
+[data-theme="dark"] .text-profit {
+    color: var(--profit) !important;
+}
+
+[data-theme="dark"] .text-loss {
+    color: var(--loss) !important;
+}
+
+/* Update Price Button Dark Mode */
+[data-theme="dark"] button[onclick*="openUpdatePriceModal"] {
+    background: var(--primary) !important;
+    color: white !important;
+}
+
+[data-theme="dark"] button[onclick*="openUpdatePriceModal"]:hover {
+    background: #1d4ed8 !important;
+}

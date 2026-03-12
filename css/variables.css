@@ -1,0 +1,21 @@
+/**
+ * CSS Variables
+ * All color and sizing variables
+ */
+
+:root {
+    --primary: #2563eb;       
+    --bg-body: #f3f4f6;       
+    --bg-white: #ffffff;
+    --profit: #16a34a;        
+    --profit-bg: #dcfce7;
+    --loss: #dc2626;          
+    --loss-bg: #fee2e2;
+    --wallet-credit: #16a34a; 
+    --wallet-debit: #dc2626;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border: #e5e7eb;
+    --nav-height: 60px;
+    --header-height: 60px;
+}

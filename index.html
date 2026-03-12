@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <base href="/" />
+
+    <title>Smart Portfolio</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="css/variables.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/layout.css" />
+    <link rel="stylesheet" href="css/components.css" />
+    <link rel="stylesheet" href="css/dark-mode.css" />
+    <link rel="stylesheet" href="css/graph.css" />
+</head>
+<body>
+    <input type="file" id="importInput" accept=".json" class="hidden-view" onchange="window.handleImportFile(this)">
+    
+    <div id="view-auth" class="auth-container">
+        <div class="auth-card">
+            <span class="auth-logo">💼</span>
+            <h1 class="auth-title">Smart Portfolio</h1>
+            <p class="auth-sub">Track Your Wealth Journey</p>
+            
+            <div id="form-login">
+                <div class="input-group" style="margin-bottom:0.75rem;">
+                    <input type="email" id="loginEmail" class="form-input" placeholder="Email Address" required autocomplete="email">
+                </div>
+                <div class="input-group" style="margin-bottom:1rem;">
+                    <input type="password" id="loginPass" class="form-input" placeholder="Password" required autocomplete="current-password">
+                </div>
+                <button onclick="window.handleLogin()" class="btn-save" style="width:100%; padding:0.875rem;">Log In</button>
+                <p class="auth-switch">Don't have an account? <span onclick="window.toggleAuthMode('signup')" class="auth-link">Sign Up</span></p>
+            </div>
+
+            <div id="form-signup" class="hidden-view">
+                <div class="input-group" style="margin-bottom:0.75rem;">
+                    <input type="email" id="signupEmail" class="form-input" placeholder="Email Address" required autocomplete="email">
+                </div>
+                <div class="input-group" style="margin-bottom:1rem;">
+                    <input type="password" id="signupPass" class="form-input" placeholder="Password (Min 6 chars)" required autocomplete="new-password">
+                </div>
+                <button onclick="window.handleSignup()" class="btn-save" style="width:100%; padding:0.875rem;">Create Account</button>
+                <p class="auth-switch">Already have an account? <span onclick="window.toggleAuthMode('login')" class="auth-link">Log In</span></p>
+            </div>
+            
+            <div id="auth-denied" class="hidden-view" style="margin-top:1rem;">
+                <p style="color:var(--loss); font-weight:bold; font-size:0.95rem; margin:0 0 0.5rem 0;">⛔ Access Restricted</p>
+                <p style="font-size:0.8rem; color:var(--text-muted); margin:0 0 1rem 0; line-height:1.4;">This app is private. Your account does not have permission to access the database.</p>
+                <button onclick="window.handleLogout()" class="btn-cancel" style="width:100%; padding:0.75rem;">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-wrapper" class="hidden-view">
+        <div id="menu-overlay" onclick="window.closeSidebar()"></div>
+
+        <aside id="side-menu">
+            <div class="menu-header"><h2 class="menu-title">My Portfolio</h2><p class="menu-sub">Smart Wealth Manager</p></div>
+            <div class="menu-body">
+                <button onclick="window.openTypeSelector('report'); window.closeSidebar()" class="menu-btn"><div class="menu-icon-box bg-icon-blue"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div><div><span class="menu-label">Download Reports</span><span class="menu-desc">Generate PDF</span></div></button>
+                <button onclick="window.openTypeSelector('backup'); window.closeSidebar()" class="menu-btn"><div class="menu-icon-box bg-icon-blue"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg></div><div><span class="menu-label">Backup Data</span><span class="menu-desc">Save JSON to device</span></div></button>
+                <button onclick="window.openTypeSelector('restore'); window.closeSidebar()" class="menu-btn"><div class="menu-icon-box bg-icon-green"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></div><div><span class="menu-label">Restore Data</span><span class="menu-desc">Import JSON file</span></div></button>
+                <hr class="menu-divider">
+                <button onclick="window.openPortfolioGraph(); window.closeSidebar()" class="menu-btn"><div class="menu-icon-box bg-icon-blue"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg></div><div><span class="menu-label">Portfolio Graph</span><span class="menu-desc">View performance chart</span></div></button>
+                <hr class="menu-divider">
+                <button onclick="window.toggleDarkMode(); window.closeSidebar()" class="menu-btn" id="dark-mode-btn">
+                    <div class="menu-icon-box bg-icon-blue">
+                        <svg id="dark-mode-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    </div>
+                    <div><span class="menu-label">Dark Mode</span><span class="menu-desc" id="dark-mode-status">Off</span></div>
+                </button>
+                <button onclick="window.handleLogout()" class="menu-btn">
+                    <div class="menu-icon-box" style="background:#fee2e2; color:#dc2626;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+                    </div>
+                    <div><span class="menu-label">Log Out</span><span class="menu-desc">Sign out of device</span></div>
+                </button>
+                <hr class="menu-divider">
+                <button onclick="window.closeSidebar()" class="menu-btn menu-btn-close"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg><span class="menu-label">Close Menu</span></button>
+            </div>
+        </aside>
+
+        <nav id="app-header" class="app-header">
+            <div class="nav-container">
+                <div class="nav-left">
+                    <button id="btn-menu" onclick="window.openSidebar()" class="btn-icon"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+                    <button id="btn-back" onclick="history.back()" class="btn-icon hidden-view"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg></button>
+                    <h1 id="page-title" class="nav-title">Stocks</h1>
+                </div>
+            </div>
+        </nav>
+
+        <main class="main-container">
+            <div id="view-stocks" class="active-view">
+                <div class="portfolio-card">
+                    <div class="pnl-row"><div><p class="label-sm">Current Value</p><h1 id="stock-current-val" class="amount-lg">₹0</h1></div><div class="text-right"><p class="label-sm">Total P&L</p><p id="stock-total-pnl" class="pnl-val">₹0 (0%)</p></div></div>
+                    <div class="invested-row"><p class="label-xs">Invested: <span id="stock-invested-val">₹0</span></p></div>
+                </div>
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input type="text" id="search-stocks" class="search-input" placeholder="Search stocks..." />
+                        <button id="clear-search-stocks" class="clear-search hidden-view" onclick="window.clearSearch('stocks')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                    </div>
+                    <div class="filter-sort-row">
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all" onclick="window.setFilter('stocks', 'all')">All</button>
+                            <button class="filter-btn" data-filter="profit" onclick="window.setFilter('stocks', 'profit')">Profit</button>
+                            <button class="filter-btn" data-filter="loss" onclick="window.setFilter('stocks', 'loss')">Loss</button>
+                        </div>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn" onclick="window.toggleSortMenu('stocks')"><span id="sort-label-stocks">Sort: Name</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
+                            <div id="sort-menu-stocks" class="sort-menu hidden-view">
+                                <button onclick="window.setSort('stocks', 'name')">Name</button>
+                                <button onclick="window.setSort('stocks', 'value')">Value</button>
+                                <button onclick="window.setSort('stocks', 'pnl')">P&L</button>
+                                <button onclick="window.setSort('stocks', 'pnlPercent')">P&L %</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-header">Your Holdings</div><div id="stock-list" class="scroll-list"></div><div id="stock-empty" class="hidden-view empty-state"><p class="empty-sub">No stocks found.</p></div>
+            </div>
+            
+            <div id="view-mfs" class="hidden-view">
+                <div class="portfolio-card mf-card-bg">
+                    <div class="pnl-row"><div><p class="label-sm">Current Value</p><h1 id="mf-current-val" class="amount-lg">₹0</h1></div><div class="text-right"><p class="label-sm">Total Returns</p><p id="mf-total-pnl" class="pnl-val">₹0 (0%)</p></div></div>
+                    <div class="invested-row"><p class="label-xs">Invested: <span id="mf-invested-val">₹0</span></p></div>
+                </div>
+                <div class="search-filter-container">
+                    <div class="search-box">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        <input type="text" id="search-mfs" class="search-input" placeholder="Search funds..." />
+                        <button id="clear-search-mfs" class="clear-search hidden-view" onclick="window.clearSearch('mfs')"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
+                    </div>
+                    <div class="filter-sort-row">
+                        <div class="filter-buttons">
+                            <button class="filter-btn active" data-filter="all" onclick="window.setFilter('mfs', 'all')">All</button>
+                            <button class="filter-btn" data-filter="profit" onclick="window.setFilter('mfs', 'profit')">Profit</button>
+                            <button class="filter-btn" data-filter="loss" onclick="window.setFilter('mfs', 'loss')">Loss</button>
+                        </div>
+                        <div class="sort-dropdown">
+                            <button class="sort-btn" onclick="window.toggleSortMenu('mfs')"><span id="sort-label-mfs">Sort: Name</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button>
+                            <div id="sort-menu-mfs" class="sort-menu hidden-view">
+                                <button onclick="window.setSort('mfs', 'name')">Name</button>
+                                <button onclick="window.setSort('mfs', 'value')">Value</button>
+                                <button onclick="window.setSort('mfs', 'pnl')">P&L</button>
+                                <button onclick="window.setSort('mfs', 'pnlPercent')">P&L %</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-header">Your Funds</div><div id="mf-list" class="scroll-list"></div><div id="mf-empty" class="hidden-view empty-state"><p class="empty-sub">No Mutual Funds added.</p></div>
+            </div>
+            
+            <div id="view-wallet" class="hidden-view">
+                <div id="wallet-bank-selection" class="active-view">
+                    <div class="personal-balance-card">
+                        <p class="balance-label">Select Your Bank Account</p>
+                        <h1 class="balance-value" style="font-size:3rem;">🏦</h1>
+                        <p style="margin-top:1rem; font-size:0.9rem; opacity:0.9;">Choose a bank to manage your expenses</p>
+                    </div>
+                    <div class="list-header">Your Bank Accounts</div>
+                    <div id="bank-accounts-list" class="scroll-list"></div>
+                    <div id="bank-empty" class="hidden-view empty-state">
+                        <div class="empty-state-icon">🏦</div>
+                        <p class="empty-state-title">No Bank Accounts</p>
+                        <p class="empty-sub">Add your first bank account to start tracking expenses</p>
+                    </div>
+                </div>
+                
+                <div id="wallet-categories-view" class="hidden-view">
+                    <div class="personal-balance-card">
+                        <p class="balance-label">Net Balance</p>
+                        <h1 id="wallet-balance" class="balance-value">₹0</h1>
+                        <p id="selected-bank-display" style="margin-top:0.75rem; font-size:0.85rem; opacity:0.9;">🏦 Bank Name</p>
+                        <div style="margin-top: 1rem; display:flex; gap:0.5rem;">
+                            <button onclick="window.openBankDeposit()" class="btn-action" style="flex:1; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; font-weight:600;">💰 Deposit</button>
+                            <button onclick="window.backToBankSelection()" class="btn-action" style="flex:1; background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3); color:white; font-weight:600;">← Change Bank</button>
+                        </div>
+                    </div>
+                    <div class="list-header">Your Categories</div>
+                    <div id="wallet-list" class="scroll-list"></div>
+                    <div id="wallet-empty" class="hidden-view empty-state"><p class="empty-sub">No categories found. Create one.</p></div>
+                </div>
+            </div>
+
+            <div id="view-detail" class="hidden-view"></div>
+            
+            <div id="view-graph" class="hidden-view">
+                <div class="graph-container">
+                    <div class="graph-header"><h2 class="graph-title">Portfolio Performance</h2><p class="graph-subtitle">Combined Stocks & Mutual Funds</p></div>
+                    <div class="time-range-selector">
+                        <button class="time-range-btn active" data-range="1d" onclick="window.setTimeRange('1d')">1D</button>
+                        <button class="time-range-btn" data-range="1w" onclick="window.setTimeRange('1w')">1W</button>
+                        <button class="time-range-btn" data-range="1m" onclick="window.setTimeRange('1m')">1M</button>
+                        <button class="time-range-btn" data-range="3m" onclick="window.setTimeRange('3m')">3M</button>
+                        <button class="time-range-btn" data-range="6m" onclick="window.setTimeRange('6m')">6M</button>
+                        <button class="time-range-btn" data-range="1y" onclick="window.setTimeRange('1y')">1Y</button>
+                        <button class="time-range-btn" data-range="5y" onclick="window.setTimeRange('5y')">5Y</button>
+                        <button class="time-range-btn" data-range="all" onclick="window.setTimeRange('all')">All</button>
+                    </div>
+                    <div class="graph-stats">
+                        <div class="graph-stat-item"><p class="graph-stat-label">Total Invested</p><p class="graph-stat-value" id="graph-invested">₹0</p></div>
+                        <div class="graph-stat-item"><p class="graph-stat-label">Current Value</p><p class="graph-stat-value" id="graph-current">₹0</p></div>
+                        <div class="graph-stat-item"><p class="graph-stat-label">Total P&L</p><p class="graph-stat-value" id="graph-pnl">₹0</p></div>
+                    </div>
+                    <div class="chart-wrapper"><canvas id="portfolio-chart"></canvas></div>
+                    <div id="graph-empty" class="hidden-view empty-state"><div class="empty-state-icon">📊</div><p class="empty-state-title">No Data Available</p><p class="empty-sub">Add transactions to see your portfolio performance</p></div>
+                </div>
+            </div>
+        </main>
+
+        <div id="bottom-nav" class="bottom-nav">
+            <button onclick="window.switchTab('stocks')" id="tab-stocks" class="nav-item active"><svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg><span>Stocks</span></button>
+            <button onclick="window.switchTab('mfs')" id="tab-mfs" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" /></svg><span>Mutual Funds</span></button>
+            <button onclick="window.switchTab('wallet')" id="tab-wallet" class="nav-item"><svg xmlns="http://www.w3.org/2000/svg" class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg><span>Wallet</span></button>
+        </div>
+
+        <div id="fab-container" class="fab-container">
+            <button onclick="window.openFabAction()" class="btn-fab fab-shadow" aria-label="Add new item">
+                <svg xmlns="http://www.w3.org/2000/svg" class="fab-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                <span id="fab-text">ADD STOCK</span>
+            </button>
+        </div>
+    </div> <div id="modal-investment" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div id="inv-header" class="header-neutral">New Transaction</div>
+            <div class="modal-body">
+                <div class="type-toggle-container"><button onclick="window.setInvType('BUY')" id="btn-type-buy" class="type-btn active">BUY</button><button onclick="window.setInvType('SELL')" id="btn-type-sell" class="type-btn">SELL</button></div>
+                <div class="input-group"><label class="input-label">Name / Ticker</label><input type="text" id="invName" placeholder="e.g. RELIANCE" class="form-input form-input-uppercase" required></div>
+                <div class="flex-row-gap">
+                    <div class="input-group input-group-flex"><label class="input-label">Price (₹)</label><input type="number" id="invPrice" placeholder="0.00" class="form-input" inputmode="decimal" min="0" step="0.01"></div>
+                    <div class="input-group input-group-flex"><label class="input-label">Quantity</label><input type="number" id="invQty" placeholder="0" class="form-input" inputmode="numeric" min="0" step="1"></div>
+                </div>
+                <div class="input-group"><label class="input-label">Date & Time</label><input type="datetime-local" id="invDate" class="form-input" required></div>
+                <div class="input-group"><label class="input-label">Notes (Optional)</label><textarea id="invNotes" class="form-input form-textarea" placeholder="Add any notes about this transaction..." maxlength="200" rows="2"></textarea></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-investment')" class="btn-cancel">Cancel</button><button onclick="window.saveInvestment()" class="btn-save">Save</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-wallet-cat" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Create Category</div>
+            <div class="modal-body">
+                <div class="input-group"><label class="input-label">Category Name</label><input type="text" id="catName" placeholder="e.g. Food, Clothes, Grocery" class="form-input" required></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-wallet-cat')" class="btn-cancel">Cancel</button><button onclick="window.saveWalletCategory()" class="btn-save">Create</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-wallet-tx" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-expense">Add Transaction</div>
+            <div class="modal-body">
+                <div id="cat-select-container" class="input-group hidden-view">
+                    <label class="input-label">Select Wallet</label>
+                    <select id="txCategory" class="form-input" style="background:var(--bg-body);"></select>
+                </div>
+                
+                <div class="amount-input-row"><span class="currency-symbol">₹</span><input type="number" id="txAmount" placeholder="0" class="amount-field" inputmode="decimal" min="0" step="0.01" required></div>
+                <div class="input-group"><label class="input-label">Date & Time</label><input type="datetime-local" id="txDate" class="form-input" required></div>
+                <div class="radio-group"><label class="radio-label"><input type="radio" name="txType" value="debit" checked> Money Out</label><label class="radio-label"><input type="radio" name="txType" value="credit"> Money In</label></div>
+                <div class="input-group"><label class="input-label">Notes (Optional)</label><textarea id="txNotes" class="form-input form-textarea" placeholder="Add any notes about this transaction..." maxlength="200" rows="2"></textarea></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-wallet-tx')" class="btn-cancel">Cancel</button><button onclick="window.saveWalletTx()" class="btn-save">Save</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-stock-edit" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Manage Holding</div>
+            <div class="modal-body">
+                <div class="input-group"><label class="input-label">Name</label><input type="text" id="editTicker" class="form-input form-input-uppercase" required></div>
+                <div class="input-group"><label class="input-label">Qty</label><input type="number" id="editQty" class="form-input" min="0" step="1" required></div>
+                <div class="input-group"><label class="input-label">Avg Price</label><input type="number" id="editAvg" class="form-input" min="0" step="0.01" required></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-stock-edit')" class="btn-cancel">Cancel</button><button onclick="window.saveStockEdit()" class="btn-save">Update</button></div>
+                <button onclick="window.triggerDeleteStock()" class="btn-delete">Delete Stock</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-type-selector" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral" id="selector-title">Select Type</div>
+            <div class="modal-body modal-body-column">
+                <button onclick="window.selectType('stocks')" class="menu-btn menu-btn-stocks"><span class="menu-label">Stocks</span></button>
+                <button onclick="window.selectType('mfs')" class="menu-btn menu-btn-mfs"><span class="menu-label">Mutual Funds</span></button>
+                <button onclick="window.selectType('wallet')" class="menu-btn menu-btn-wallet"><span class="menu-label">Wallet</span></button>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-type-selector')" class="btn-cancel btn-cancel-full">Cancel</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-bank-selector" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Select Bank Account</div>
+            <div class="modal-body modal-body-column">
+                <button onclick="window.selectBank(null)" class="menu-btn" style="background:#f0f9ff;"><span class="menu-label">🏦 All Banks</span></button>
+                <div id="bank-list-container"></div>
+                <hr style="margin: 1rem 0; border:0; border-top:1px solid var(--border);">
+                <button onclick="window.openAddBankModal()" class="menu-btn" style="background:#dcfce7;"><span class="menu-label">+ Add New Bank</span></button>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-bank-selector')" class="btn-cancel btn-cancel-full">Cancel</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-bank" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Add Bank Account</div>
+            <div class="modal-body">
+                <div class="input-group"><label class="input-label">Bank Name</label><input type="text" id="bankName" placeholder="e.g. SBI, Canara Bank" class="form-input" required></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-add-bank')" class="btn-cancel">Cancel</button><button onclick="window.saveBankAccount()" class="btn-save">Add Bank</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-bank" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Edit Bank Account</div>
+            <div class="modal-body">
+                <div class="input-group"><label class="input-label">Bank Name</label><input type="text" id="editBankName" class="form-input" required></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-edit-bank')" class="btn-cancel">Cancel</button><button onclick="window.updateBankAccount()" class="btn-save">Update</button></div>
+                <button onclick="window.deleteBankAccount()" class="btn-delete">Delete Bank</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-bank-deposit" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Bank Deposits</div>
+            <div class="modal-body">
+                <div style="margin-bottom:1rem; padding:1rem; background:var(--bg-body); border-radius:0.5rem;">
+                    <p style="margin:0; font-size:0.8rem; color:var(--text-muted);">Total Deposited</p>
+                    <h2 id="total-deposits" style="margin:0.25rem 0 0 0; color:var(--text-main);">₹0</h2>
+                </div>
+                <div id="deposits-list" style="max-height:300px; overflow-y:auto; margin-bottom:1rem;"></div>
+                <button onclick="window.openAddDeposit()" class="btn-action btn-primary" style="width:100%; margin-bottom:0.5rem;">+ Add Deposit</button>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-bank-deposit')" class="btn-cancel btn-cancel-full">Close</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-add-deposit" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Add Deposit</div>
+            <div class="modal-body">
+                <div class="amount-input-row"><span class="currency-symbol">₹</span><input type="number" id="depositAmount" placeholder="0" class="amount-field" inputmode="decimal" min="0" step="0.01" required></div>
+                <div class="input-group"><label class="input-label">Date & Time</label><input type="datetime-local" id="depositDate" class="form-input" required></div>
+                <div class="input-group"><label class="input-label">Notes (Optional)</label><textarea id="depositNotes" class="form-input form-textarea" placeholder="e.g. Salary, Transfer from..." maxlength="200" rows="2"></textarea></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-add-deposit')" class="btn-cancel">Cancel</button><button onclick="window.saveDeposit()" class="btn-save">Save</button></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-deposit" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Edit Deposit</div>
+            <div class="modal-body">
+                <div class="amount-input-row"><span class="currency-symbol">₹</span><input type="number" id="editDepositAmount" placeholder="0" class="amount-field" inputmode="decimal" min="0" step="0.01" required></div>
+                <div class="input-group"><label class="input-label">Date & Time</label><input type="datetime-local" id="editDepositDate" class="form-input" required></div>
+                <div class="input-group"><label class="input-label">Notes (Optional)</label><textarea id="editDepositNotes" class="form-input form-textarea" placeholder="e.g. Salary, Transfer from..." maxlength="200" rows="2"></textarea></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-edit-deposit')" class="btn-cancel">Cancel</button><button onclick="window.updateDeposit()" class="btn-save">Update</button></div>
+                <button onclick="window.deleteDeposit()" class="btn-delete">Delete Deposit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-update-price" class="hidden-view modal-overlay">
+        <div class="modal-content animate-slide-up">
+            <div class="header-neutral">Update Current Price</div>
+            <div class="modal-body">
+                <p style="margin:0 0 1rem 0; font-size:0.85rem; color:var(--text-muted); text-align:center;">Enter the current market price to calculate returns</p>
+                <div class="amount-input-row"><span class="currency-symbol">₹</span><input type="number" id="updatePriceInput" placeholder="0.00" class="amount-field" inputmode="decimal" min="0" step="0.01" required></div>
+                <div class="modal-actions"><button onclick="window.closeModal('modal-update-price')" class="btn-cancel">Cancel</button><button onclick="window.saveCurrentPrice()" class="btn-save">Update Price</button></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

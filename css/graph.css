@@ -1,0 +1,129 @@
+/**
+ * Graph/Chart Styles
+ * Portfolio graph view styles
+ */
+
+.graph-container {
+    padding: 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.graph-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.graph-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-main);
+}
+
+.graph-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.time-range-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+    -webkit-overflow-scrolling: touch;
+}
+
+.time-range-selector::-webkit-scrollbar {
+    display: none;
+}
+
+.time-range-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: var(--bg-body);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    min-width: 50px;
+}
+
+.time-range-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.time-range-btn:hover:not(.active) {
+    background: white;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.graph-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.graph-stat-item {
+    text-align: center;
+}
+
+.graph-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin: 0 0 0.25rem 0;
+}
+
+.graph-stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0;
+}
+
+.chart-wrapper {
+    background: white;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    margin-bottom: 1rem;
+    position: relative;
+    height: 300px;
+}
+
+#portfolio-chart {
+    max-height: 300px;
+}
+
+/* Dark Mode for Graph */
+[data-theme="dark"] .graph-stats,
+[data-theme="dark"] .chart-wrapper {
+    background: var(--bg-white);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .time-range-btn {
+    background: var(--bg-body);
+    border-color: var(--border);
+    color: var(--text-muted);
+}
+
+[data-theme="dark"] .time-range-btn:hover:not(.active) {
+    background: var(--bg-white);
+    color: var(--primary);
+}

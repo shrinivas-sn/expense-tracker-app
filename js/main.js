@@ -1,3 +1,4 @@
+
 /**
  * Smart Portfolio - Main Application Controller
  * Manages routing, state, and user interactions
@@ -26,7 +27,7 @@ const ALLOWED_USERS = ['your.email@example.com'];
  * Application state management
  */
 let appState = {
-    currentTab: 'stocks', 
+    currentTab: 'stocks',
     currentInvType: 'BUY',
     editingStockId: null,
     editingTxId: null,
@@ -55,21 +56,21 @@ function getLocalISOString() {
 // Initialize app on DOM load
 document.addEventListener('DOMContentLoaded', () => {
     initTheme(); // Initialize theme first
-    
+
     // AUTH LISTENER: The Gatekeeper
     onAuthChange((user) => {
         appState.user = user;
-        
+
         if (user) {
             // Check Access
             if (ALLOWED_USERS.includes(user.email)) {
                 // ACCESS GRANTED
                 document.getElementById('view-auth').classList.add('hidden-view');
                 document.getElementById('app-wrapper').classList.remove('hidden-view');
-                
+
                 // Initialize Router & App
                 handleRoute(window.location.pathname);
-                
+
                 // Init handlers only once
                 if (!window.searchHandlersInitialized) {
                     setTimeout(initSearchHandlers, 100);
@@ -115,17 +116,17 @@ window.toggleAuthMode = (mode) => {
 window.handleLogin = async () => {
     const email = document.getElementById('loginEmail').value;
     const pass = document.getElementById('loginPass').value;
-    
+
     if (!email || !pass) {
         showNotification("Please enter email and password", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#form-login button');
     setButtonLoading(btn, "Logging In...");
-    
+
     const result = await loginUser(email, pass);
-    
+
     if (result.success) {
         // Auth Listener will handle UI switch
     } else {
@@ -137,17 +138,17 @@ window.handleLogin = async () => {
 window.handleSignup = async () => {
     const email = document.getElementById('signupEmail').value;
     const pass = document.getElementById('signupPass').value;
-    
+
     if (!email || !pass) {
         showNotification("Please enter email and password", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#form-signup button');
     setButtonLoading(btn, "Creating Account...");
-    
+
     const result = await signupUser(email, pass);
-    
+
     if (result.success) {
         // Auth Listener will handle UI switch (likely to Access Denied since new email isn't in whitelist)
         showNotification("Account created!", "success");
@@ -171,26 +172,26 @@ window.handleLogout = async () => {
 function handleRoute(path) {
     // Normalize path - remove trailing slash and handle .html extension
     path = path.replace(/\/$/, "").replace(/\.html$/, "");
-    
+
     // Exact Matches
     if (path === "" || path === "/" || path === "/index" || path === "/stocks") {
         switchTab('stocks', false);
         return;
-    } 
-    
+    }
+
     if (path === "/mfs") {
         switchTab('mfs', false);
         return;
     }
-    
+
     if (path === "/wallet") {
         switchTab('wallet', false);
         return;
     }
-    
+
     // Deep Links
     if (path.startsWith("/details/")) {
-        const parts = path.split('/'); 
+        const parts = path.split('/');
         if (parts.length >= 4) {
             const type = parts[2];
             const id = decodeURIComponent(parts[3]);
@@ -207,7 +208,7 @@ function handleRoute(path) {
         }
         return;
     }
-    
+
     // FALLBACK (Sticky Routing Fix)
     // If exact match fails, check for keywords to keep user on correct tab
     if (path.includes('wallet')) {
@@ -235,7 +236,7 @@ function restoreState(state) {
  * @param {string} tabName - Tab to switch to ('stocks', 'mfs', 'wallet')
  * @param {boolean} pushHistory - Whether to update browser history
  */
-window.switchTab = async function(tabName, pushHistory = true) {
+window.switchTab = async function (tabName, pushHistory = true) {
     appState.currentTab = tabName;
     if (tabName === 'wallet') {
         appState.walletView = 'bank-selection';
@@ -281,7 +282,7 @@ async function loadDataForTab(tab) {
     } else {
         data = await loadWalletCategories();
         appState.originalData.wallet = data;
-        
+
         if (appState.walletView === 'bank-selection') {
             renderBankSelection(data);
         } else {
@@ -316,10 +317,10 @@ function applyFiltersAndRender(tab, data) {
  * @param {string} id - Stock/MF document ID
  * @param {boolean} pushHistory - Whether to update browser history
  */
-window.openStockDetail = async function(id, pushHistory = true) {
+window.openStockDetail = async function (id, pushHistory = true) {
     let stockData, historyData;
     const isMf = appState.currentTab === 'mfs';
-    if(!isMf) {
+    if (!isMf) {
         const stocks = await loadStocks();
         stockData = stocks.find(s => s.id === id);
         historyData = await getStockHistory(id);
@@ -328,7 +329,7 @@ window.openStockDetail = async function(id, pushHistory = true) {
         stockData = mfs.find(s => s.id === id);
         historyData = await getMFHistory(id);
     }
-    if(!stockData) return;
+    if (!stockData) return;
     renderStockDetailView(stockData, historyData);
     document.getElementById(`view-${appState.currentTab}`).classList.add('hidden-view');
     document.getElementById('view-detail').classList.remove('hidden-view');
@@ -349,7 +350,7 @@ window.openStockDetail = async function(id, pushHistory = true) {
  * @param {string} name - Category name
  * @param {boolean} pushHistory - Whether to update browser history
  */
-window.openWalletDetail = async function(id, name, pushHistory = true) {
+window.openWalletDetail = async function (id, name, pushHistory = true) {
     appState.activeCatId = id;
     appState.activeCatName = name;
     const historyData = await getWalletCategoryHistory(id);
@@ -371,16 +372,16 @@ window.openWalletDetail = async function(id, name, pushHistory = true) {
  * Opens type selector modal for reports/backup/restore
  * @param {string} action - Action type ('report', 'backup', 'restore')
  */
-window.openTypeSelector = function(action) {
+window.openTypeSelector = function (action) {
     appState.actionType = action;
     const titleMap = { 'report': 'Download Report', 'backup': 'Backup Data', 'restore': 'Restore Data' };
     document.getElementById('selector-title').innerText = titleMap[action];
-    
+
     // Reset file input for restore
-    if(action === 'restore') {
+    if (action === 'restore') {
         document.getElementById('importInput').value = '';
     }
-    
+
     window.openModal('modal-type-selector');
 }
 
@@ -388,9 +389,9 @@ window.openTypeSelector = function(action) {
  * Handles type selection from modal
  * @param {string} type - Selected type ('stocks', 'mfs', 'wallet')
  */
-window.selectType = function(type) {
+window.selectType = function (type) {
     window.closeModal('modal-type-selector');
-    
+
     if (appState.actionType === 'report') {
         generateReport(type);
     } else if (appState.actionType === 'backup') {
@@ -407,10 +408,10 @@ window.selectType = function(type) {
  * Handles file import for restore
  * @param {HTMLInputElement} input - File input element
  */
-window.handleImportFile = function(input) {
+window.handleImportFile = function (input) {
     const file = input.files[0];
     const targetType = input.getAttribute('data-target-type');
-    if(file && targetType) {
+    if (file && targetType) {
         importData(file, targetType);
     }
 }
@@ -420,26 +421,26 @@ window.handleImportFile = function(input) {
  * @param {string} id - Transaction ID
  * @param {string} dataStr - Encoded transaction data
  */
-window.prepEditTx = function(id, dataStr) {
+window.prepEditTx = function (id, dataStr) {
     const data = JSON.parse(decodeURIComponent(dataStr));
     appState.editingTxId = id;
-    
+
     if (appState.currentTab === 'wallet') {
         document.getElementById('txAmount').value = data.amount;
         document.getElementById('txDate').value = data.date;
         document.getElementById('txNotes').value = data.notes || '';
         const radios = document.getElementsByName('txType');
-        for(let r of radios) { if(r.value === data.type) r.checked = true; }
-        
+        for (let r of radios) { if (r.value === data.type) r.checked = true; }
+
         // Hide Category Select during Edit
         document.getElementById('cat-select-container').classList.add('hidden-view');
-        
+
         // Change Button Text
         const btn = document.querySelector('#modal-wallet-tx .btn-save');
         btn.innerText = "Update";
         btn.onclick = window.saveWalletTxEdit;
         window.openModal('modal-wallet-tx');
-        
+
     } else {
         // Stocks/MF
         document.getElementById('invName').value = "LOCKED";
@@ -449,7 +450,7 @@ window.prepEditTx = function(id, dataStr) {
         document.getElementById('invDate').value = data.date;
         document.getElementById('invNotes').value = data.notes || '';
         window.setInvType(data.type);
-        
+
         const btn = document.querySelector('#modal-investment .btn-save');
         btn.innerText = "Update";
         btn.onclick = window.saveInvestmentEdit;
@@ -460,12 +461,12 @@ window.prepEditTx = function(id, dataStr) {
 /**
  * Saves edited investment transaction
  */
-window.saveInvestmentEdit = async function() {
+window.saveInvestmentEdit = async function () {
     const price = parseFloat(document.getElementById('invPrice').value);
     const qty = parseFloat(document.getElementById('invQty').value);
     const date = document.getElementById('invDate').value;
     const notes = document.getElementById('invNotes').value.trim();
-    
+
     if (!price || price <= 0) {
         showNotification("Please enter a valid price", "error");
         return;
@@ -478,21 +479,21 @@ window.saveInvestmentEdit = async function() {
         showNotification("Please select a date", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-investment .btn-save');
     const txData = { price, qty, date, type: appState.currentInvType };
     if (notes) txData.notes = notes;
-    
+
     const pathParts = window.location.pathname.split('/');
     const parentId = pathParts[3];
-    
+
     setButtonLoading(btn, "Updating...");
-    
+
     try {
-        const success = (appState.currentTab === 'stocks') 
+        const success = (appState.currentTab === 'stocks')
             ? await updateStockTransaction(parentId, appState.editingTxId, txData)
             : await updateMFTransaction(parentId, appState.editingTxId, txData);
-        
+
         if (success) {
             showNotification("Transaction Updated", "success");
             window.closeModal('modal-investment');
@@ -511,12 +512,12 @@ window.saveInvestmentEdit = async function() {
 /**
  * Saves edited wallet transaction
  */
-window.saveWalletTxEdit = async function() {
+window.saveWalletTxEdit = async function () {
     const amount = parseFloat(document.getElementById('txAmount').value);
     const date = document.getElementById('txDate').value;
     const type = document.querySelector('input[name="txType"]:checked').value;
     const notes = document.getElementById('txNotes').value.trim();
-    
+
     if (!amount || amount <= 0) {
         showNotification("Please enter a valid amount", "error");
         return;
@@ -525,14 +526,14 @@ window.saveWalletTxEdit = async function() {
         showNotification("Please select a date", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-wallet-tx .btn-save');
     setButtonLoading(btn, "Updating...");
-    
+
     try {
         const txData = { amount, date, type };
         if (notes) txData.notes = notes;
-        
+
         const success = await updateWalletTransaction(appState.activeCatId, appState.editingTxId, txData);
         if (success) {
             showNotification("Transaction Updated", "success");
@@ -554,7 +555,7 @@ function validateInvestmentForm() {
     const price = parseFloat(document.getElementById('invPrice').value);
     const qty = parseFloat(document.getElementById('invQty').value);
     const date = document.getElementById('invDate').value;
-    
+
     if (!ticker || ticker.length < 1) {
         showNotification("Please enter a valid ticker/name", "error");
         return false;
@@ -574,36 +575,36 @@ function validateInvestmentForm() {
     return true;
 }
 
-window.saveInvestment = async function() {
+window.saveInvestment = async function () {
     if (!validateInvestmentForm()) return;
-    
+
     const btn = document.querySelector('#modal-investment .btn-save');
     const ticker = document.getElementById('invName').value.trim().toUpperCase();
     const price = parseFloat(document.getElementById('invPrice').value);
     const qty = parseFloat(document.getElementById('invQty').value);
     const date = document.getElementById('invDate').value;
     const notes = document.getElementById('invNotes').value.trim();
-    
+
     setButtonLoading(btn, "Saving...");
-    
+
     try {
         const txData = { type: appState.currentInvType, qty, price, date };
         if (notes) txData.notes = notes;
-        
-        const success = (appState.currentTab === 'stocks') 
-            ? await saveStockTransaction(ticker, txData) 
+
+        const success = (appState.currentTab === 'stocks')
+            ? await saveStockTransaction(ticker, txData)
             : await saveMFTransaction(ticker, txData);
-        
+
         if (success) {
             showNotification("✓ Transaction Recorded!", "success");
             window.closeModal('modal-investment');
-            document.getElementById('invNotes').value = ''; 
-            
+            document.getElementById('invNotes').value = '';
+
             await loadDataForTab(appState.currentTab);
             const isDetailOpen = !document.getElementById('view-detail').classList.contains('hidden-view');
             if (isDetailOpen) {
-                const pathParts = window.location.pathname.split('/'); 
-                const currentId = pathParts[3]; 
+                const pathParts = window.location.pathname.split('/');
+                const currentId = pathParts[3];
                 if (currentId) {
                     await window.openStockDetail(currentId, false);
                 }
@@ -619,24 +620,24 @@ window.saveInvestment = async function() {
     }
 }
 
-window.deleteStockTx = async function(stockId, txId) {
+window.deleteStockTx = async function (stockId, txId) {
     let success = (appState.currentTab === 'stocks') ? await deleteStockTransaction(stockId, txId) : await deleteMFTransaction(stockId, txId);
-    if(success) {
+    if (success) {
         showNotification("Deleted", "success");
         window.openStockDetail(stockId, false);
     } else { showNotification("Failed", "error"); }
 }
 
-window.saveWalletCategory = async function() {
+window.saveWalletCategory = async function () {
     const name = document.getElementById('catName').value.trim();
     if (!name || name.length < 1) {
         showNotification("Please enter an account name", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-wallet-cat .btn-save');
     setButtonLoading(btn, "Creating...");
-    
+
     try {
         const success = await createWalletCategory(name, appState.selectedBank);
         if (success) {
@@ -658,34 +659,34 @@ window.saveWalletCategory = async function() {
 async function renderBankSelection(categories) {
     if (appState.isRenderingBanks) return;
     appState.isRenderingBanks = true;
-    
+
     document.getElementById('wallet-bank-selection').classList.remove('hidden-view');
     document.getElementById('wallet-categories-view').classList.add('hidden-view');
-    
+
     const banks = [...new Set(categories.map(c => c.bankAccount || "General"))];
     const container = document.getElementById('bank-accounts-list');
     const emptyState = document.getElementById('bank-empty');
-    
+
     if (banks.length === 0) {
         container.innerHTML = '';
         emptyState.classList.remove('hidden-view');
         appState.isRenderingBanks = false;
         return;
     }
-    
+
     emptyState.classList.add('hidden-view');
-    
+
     const bankElements = [];
     for (const bank of banks) {
         const bankCategories = categories.filter(c => (c.bankAccount || "General") === bank);
         const categoriesBalance = bankCategories.reduce((sum, c) => sum + (parseFloat(c.netBalance) || 0), 0);
-        
+
         const deposits = await getBankDeposits(bank);
         const depositsTotal = deposits.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
-        
+
         const totalBalance = depositsTotal + categoriesBalance;
         const balanceColor = totalBalance >= 0 ? 'var(--profit)' : 'var(--loss)';
-        
+
         const div = document.createElement('div');
         div.className = 'list-item-row';
         div.innerHTML = `
@@ -704,13 +705,13 @@ async function renderBankSelection(categories) {
         `;
         bankElements.push(div);
     }
-    
+
     container.innerHTML = '';
     bankElements.forEach(el => container.appendChild(el));
     appState.isRenderingBanks = false;
 }
 
-window.selectBankAccount = function(bankName) {
+window.selectBankAccount = function (bankName) {
     appState.selectedBank = bankName;
     appState.walletView = 'categories';
     document.getElementById('wallet-bank-selection').classList.add('hidden-view');
@@ -721,27 +722,27 @@ window.selectBankAccount = function(bankName) {
     loadDataForTab('wallet');
 }
 
-window.backToBankSelection = function() {
+window.backToBankSelection = function () {
     appState.walletView = 'bank-selection';
     appState.selectedBank = null;
     loadDataForTab('wallet');
 }
 
-window.openAddBankModal = function() {
+window.openAddBankModal = function () {
     document.getElementById('bankName').value = '';
     window.openModal('modal-add-bank');
 }
 
-window.saveBankAccount = async function() {
+window.saveBankAccount = async function () {
     const bankName = document.getElementById('bankName').value.trim();
     if (!bankName || bankName.length < 1) {
         showNotification("Please enter a bank name", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-add-bank .btn-save');
     setButtonLoading(btn, "Adding...");
-    
+
     try {
         // Create a placeholder category to make the bank visible
         const success = await createWalletCategory("General", bankName);
@@ -760,22 +761,22 @@ window.saveBankAccount = async function() {
     }
 }
 
-window.openEditBankModal = function(bankName) {
+window.openEditBankModal = function (bankName) {
     appState.editingBankName = bankName;
     document.getElementById('editBankName').value = bankName;
     window.openModal('modal-edit-bank');
 }
 
-window.updateBankAccount = async function() {
+window.updateBankAccount = async function () {
     const newBankName = document.getElementById('editBankName').value.trim();
     if (!newBankName || newBankName.length < 1) {
         showNotification("Please enter a bank name", "error");
         return;
     }
-    
+
     const oldBankName = appState.editingBankName;
     const categories = appState.originalData.wallet;
-    
+
     for (const cat of categories) {
         if ((cat.bankAccount || "General") === oldBankName) {
             await updateDoc(doc(db, "wallet_categories", cat.id), {
@@ -783,32 +784,32 @@ window.updateBankAccount = async function() {
             });
         }
     }
-    
+
     showNotification("Bank updated successfully", "success");
     window.closeModal('modal-edit-bank');
     await loadDataForTab('wallet');
 }
 
-window.deleteBankAccount = async function() {
+window.deleteBankAccount = async function () {
     const bankName = appState.editingBankName;
     const categories = appState.originalData.wallet.filter(c => (c.bankAccount || "General") === bankName);
-    
+
     const confirmed = await showConfirm(
         `Delete bank "${bankName}" and all its ${categories.length} categories?`,
         "Confirm Delete"
     );
-    
+
     if (!confirmed) return;
-    
+
     const btn = document.querySelector('#modal-edit-bank .btn-delete');
     setButtonLoading(btn, "Deleting...");
-    
+
     try {
         // Delete all categories under this bank
         for (const cat of categories) {
             await deleteWalletCategory(cat.id);
         }
-        
+
         showNotification("Bank and all categories deleted successfully", "success");
         window.closeModal('modal-edit-bank');
         await loadDataForTab('wallet');
@@ -821,15 +822,15 @@ window.deleteBankAccount = async function() {
 }
 
 // Bank Deposit Functions
-window.openBankDeposit = async function() {
+window.openBankDeposit = async function () {
     const deposits = await getBankDeposits(appState.selectedBank);
     const totalDeposits = deposits.reduce((sum, d) => sum + (parseFloat(d.amount) || 0), 0);
-    
+
     document.getElementById('total-deposits').innerText = formatCurrency(totalDeposits);
-    
+
     const container = document.getElementById('deposits-list');
     container.innerHTML = '';
-    
+
     if (deposits.length === 0) {
         container.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding:2rem;">No deposits yet</p>';
     } else {
@@ -850,11 +851,11 @@ window.openBankDeposit = async function() {
             container.appendChild(div);
         });
     }
-    
+
     window.openModal('modal-bank-deposit');
 }
 
-window.openAddDeposit = function() {
+window.openAddDeposit = function () {
     window.closeModal('modal-bank-deposit');
     document.getElementById('depositAmount').value = '';
     document.getElementById('depositDate').value = getLocalISOString();
@@ -862,11 +863,11 @@ window.openAddDeposit = function() {
     window.openModal('modal-add-deposit');
 }
 
-window.saveDeposit = async function() {
+window.saveDeposit = async function () {
     const amount = parseFloat(document.getElementById('depositAmount').value);
     const date = document.getElementById('depositDate').value;
     const notes = document.getElementById('depositNotes').value.trim();
-    
+
     if (!amount || amount <= 0) {
         showNotification("Please enter a valid amount", "error");
         return;
@@ -875,10 +876,10 @@ window.saveDeposit = async function() {
         showNotification("Please select a date", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-add-deposit .btn-save');
     setButtonLoading(btn, "Saving...");
-    
+
     try {
         const success = await addBankDeposit(appState.selectedBank, amount, date, notes);
         if (success) {
@@ -897,7 +898,7 @@ window.saveDeposit = async function() {
     }
 }
 
-window.openEditDeposit = function(id, amount, date, notes) {
+window.openEditDeposit = function (id, amount, date, notes) {
     appState.editingDepositId = id;
     document.getElementById('editDepositAmount').value = amount;
     document.getElementById('editDepositDate').value = date;
@@ -906,11 +907,11 @@ window.openEditDeposit = function(id, amount, date, notes) {
     window.openModal('modal-edit-deposit');
 }
 
-window.updateDeposit = async function() {
+window.updateDeposit = async function () {
     const amount = parseFloat(document.getElementById('editDepositAmount').value);
     const date = document.getElementById('editDepositDate').value;
     const notes = document.getElementById('editDepositNotes').value.trim();
-    
+
     if (!amount || amount <= 0) {
         showNotification("Please enter a valid amount", "error");
         return;
@@ -919,10 +920,10 @@ window.updateDeposit = async function() {
         showNotification("Please select a date", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-edit-deposit .btn-save');
     setButtonLoading(btn, "Updating...");
-    
+
     try {
         const success = await updateBankDeposit(appState.editingDepositId, amount, date, notes);
         if (success) {
@@ -941,13 +942,13 @@ window.updateDeposit = async function() {
     }
 }
 
-window.deleteDeposit = async function() {
+window.deleteDeposit = async function () {
     const confirmed = await showConfirm("Delete this deposit?", "Confirm Delete");
     if (!confirmed) return;
-    
+
     const btn = document.querySelector('#modal-edit-deposit .btn-delete');
     setButtonLoading(btn, "Deleting...");
-    
+
     try {
         const success = await deleteBankDeposit(appState.editingDepositId);
         if (success) {
@@ -967,8 +968,8 @@ window.deleteDeposit = async function() {
 }
 
 // --- NEW QUICK DEPOSIT LOGIC ---
-window.openQuickDeposit = async function() {
-    const categories = await loadWalletCategories(); 
+window.openQuickDeposit = async function () {
+    const categories = await loadWalletCategories();
     if (!categories || categories.length === 0) {
         showNotification("Please create an account first", "error");
         document.getElementById('catName').value = '';
@@ -990,9 +991,9 @@ window.openQuickDeposit = async function() {
     document.getElementById('txAmount').value = '';
     document.getElementById('txDate').value = getLocalISOString();
     document.getElementById('txNotes').value = '';
-    
+
     appState.activeCatId = null;
-    
+
     const btn = document.querySelector('#modal-wallet-tx .btn-save');
     btn.innerText = "Save";
     btn.onclick = window.saveWalletTx;
@@ -1000,14 +1001,14 @@ window.openQuickDeposit = async function() {
     window.openModal('modal-wallet-tx');
 }
 
-window.saveWalletTx = async function() {
+window.saveWalletTx = async function () {
     let targetCatId = appState.activeCatId;
-    
+
     if (!targetCatId) {
         const select = document.getElementById('txCategory');
         if (select) targetCatId = select.value;
     }
-    
+
     if (!targetCatId) {
         showNotification("Please select a wallet account", "error");
         return;
@@ -1017,7 +1018,7 @@ window.saveWalletTx = async function() {
     const date = document.getElementById('txDate').value;
     const type = document.querySelector('input[name="txType"]:checked').value;
     const notes = document.getElementById('txNotes').value.trim();
-    
+
     if (!amount || amount <= 0) {
         showNotification("Please enter a valid amount", "error");
         return;
@@ -1026,20 +1027,20 @@ window.saveWalletTx = async function() {
         showNotification("Please select a date", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-wallet-tx .btn-save');
     setButtonLoading(btn, "Saving...");
-    
+
     try {
         const txData = { amount, date, type };
         if (notes) txData.notes = notes;
-        
+
         const success = await addWalletTransaction(targetCatId, txData);
         if (success) {
             showNotification("Transaction Saved", "success");
             window.closeModal('modal-wallet-tx');
-            document.getElementById('txNotes').value = ''; 
-            
+            document.getElementById('txNotes').value = '';
+
             await loadDataForTab('wallet');
             if (appState.activeCatId) {
                 await window.openWalletDetail(appState.activeCatId, appState.activeCatName, false);
@@ -1055,14 +1056,14 @@ window.saveWalletTx = async function() {
     }
 }
 
-window.deleteWalletTx = async function(catId, txId) {
-    if(await deleteWalletTransaction(catId, txId)) {
+window.deleteWalletTx = async function (catId, txId) {
+    if (await deleteWalletTransaction(catId, txId)) {
         showNotification("Deleted", "success");
         window.openWalletDetail(catId, appState.activeCatName, false);
     }
 }
 
-window.openFabAction = function() {
+window.openFabAction = function () {
     if (appState.currentTab === 'wallet') {
         if (appState.walletView === 'bank-selection') {
             // Add new bank
@@ -1100,23 +1101,23 @@ window.openFabAction = function() {
     }
 }
 
-window.openStockDetailAdd = function(ticker, type) {
+window.openStockDetailAdd = function (ticker, type) {
     document.getElementById('invName').value = ticker;
-    document.getElementById('invName').readOnly = true; 
+    document.getElementById('invName').readOnly = true;
     document.getElementById('invPrice').value = '';
     document.getElementById('invQty').value = '';
     document.getElementById('invDate').value = getLocalISOString();
     document.getElementById('invNotes').value = '';
     window.setInvType(type);
-    
+
     const btn = document.querySelector('#modal-investment .btn-save');
     btn.innerText = "Save";
     btn.onclick = window.saveInvestment;
-    
+
     window.openModal('modal-investment');
 }
 
-window.openStockEdit = function(id, ticker, qty, avg) {
+window.openStockEdit = function (id, ticker, qty, avg) {
     appState.editingStockId = id;
     document.getElementById('editTicker').value = ticker;
     document.getElementById('editQty').value = qty;
@@ -1124,12 +1125,12 @@ window.openStockEdit = function(id, ticker, qty, avg) {
     window.openModal('modal-stock-edit');
 }
 
-window.saveStockEdit = async function() {
+window.saveStockEdit = async function () {
     const id = appState.editingStockId;
     const name = document.getElementById('editTicker').value.trim().toUpperCase();
     const qty = parseFloat(document.getElementById('editQty').value);
     const avg = parseFloat(document.getElementById('editAvg').value);
-    
+
     if (!name || name.length < 1) {
         showNotification("Please enter a valid name", "error");
         return;
@@ -1142,15 +1143,15 @@ window.saveStockEdit = async function() {
         showNotification("Please enter a valid average price", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-stock-edit .btn-save');
     setButtonLoading(btn, "Updating...");
-    
+
     try {
-        const success = (appState.currentTab === 'stocks') 
-            ? await updateStock(id, name, qty, avg) 
+        const success = (appState.currentTab === 'stocks')
+            ? await updateStock(id, name, qty, avg)
             : await updateMF(id, name, qty, avg);
-        
+
         if (success) {
             showNotification("Updated Successfully", "success");
             window.closeModal('modal-stock-edit');
@@ -1166,10 +1167,10 @@ window.saveStockEdit = async function() {
     }
 }
 
-window.triggerDeleteStock = async function() {
+window.triggerDeleteStock = async function () {
     if (!appState.editingStockId) return;
     let success = (appState.currentTab === 'stocks') ? await deleteStock(appState.editingStockId) : await deleteMF(appState.editingStockId);
-    if(success) {
+    if (success) {
         showNotification("Item Deleted", "success");
         window.closeModal('modal-stock-edit');
         window.switchTab(appState.currentTab, true);
@@ -1201,7 +1202,7 @@ window.openModal = (id) => {
 
 window.closeModal = (id) => document.getElementById(id).classList.add('hidden-view');
 
-window.setInvType = function(type) {
+window.setInvType = function (type) {
     appState.currentInvType = type;
     document.getElementById('btn-type-buy').classList.toggle('active', type === 'BUY');
     document.getElementById('btn-type-sell').classList.toggle('active', type === 'SELL');
@@ -1239,7 +1240,7 @@ function initSearchHandlers() {
     });
 }
 
-window.setFilter = function(tab, filterType) {
+window.setFilter = function (tab, filterType) {
     appState.filters[tab] = filterType;
     const container = document.querySelector(`#view-${tab} .filter-buttons`);
     if (container) {
@@ -1250,7 +1251,7 @@ window.setFilter = function(tab, filterType) {
     applyFiltersAndRender(tab, appState.originalData[tab]);
 }
 
-window.toggleSortMenu = function(tab) {
+window.toggleSortMenu = function (tab) {
     const menu = document.getElementById(`sort-menu-${tab}`);
     if (menu) {
         document.querySelectorAll('.sort-menu').forEach(m => {
@@ -1260,7 +1261,7 @@ window.toggleSortMenu = function(tab) {
     }
 }
 
-window.setSort = function(tab, sortBy) {
+window.setSort = function (tab, sortBy) {
     appState.sortBy[tab] = sortBy;
     const label = document.getElementById(`sort-label-${tab}`);
     const labels = {
@@ -1277,7 +1278,7 @@ window.setSort = function(tab, sortBy) {
     applyFiltersAndRender(tab, appState.originalData[tab]);
 }
 
-window.clearSearch = function(tab) {
+window.clearSearch = function (tab) {
     const searchInput = document.getElementById(`search-${tab}`);
     const clearBtn = document.getElementById(`clear-search-${tab}`);
     if (searchInput) {
@@ -1296,7 +1297,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
-window.openPortfolioGraph = async function() {
+window.openPortfolioGraph = async function () {
     ['stocks', 'mfs', 'wallet', 'detail'].forEach(v => {
         const el = document.getElementById(`view-${v}`);
         if (el) {
@@ -1317,7 +1318,7 @@ window.openPortfolioGraph = async function() {
     await updateGraph('1m');
 };
 
-window.setTimeRange = async function(range) {
+window.setTimeRange = async function (range) {
     await updateGraph(range);
 };
 
@@ -1325,7 +1326,7 @@ window.setTimeRange = async function(range) {
 // This ensures that when in Detail View, clicking back returns to the current tab's list
 // regardless of browser history state.
 const originalBackClick = document.getElementById('btn-back')?.onclick;
-document.getElementById('btn-back')?.addEventListener('click', function(e) {
+document.getElementById('btn-back')?.addEventListener('click', function (e) {
     e.preventDefault(); // Take full control
     const graphView = document.getElementById('view-graph');
     const detailView = document.getElementById('view-detail');
@@ -1333,7 +1334,7 @@ document.getElementById('btn-back')?.addEventListener('click', function(e) {
     if (graphView && !graphView.classList.contains('hidden-view')) {
         window.switchTab('stocks', true);
         destroyGraph();
-    } 
+    }
     else if (detailView && !detailView.classList.contains('hidden-view')) {
         // Check if we're in wallet and coming from categories view
         if (appState.currentTab === 'wallet' && appState.selectedBank) {
@@ -1351,11 +1352,11 @@ document.getElementById('btn-back')?.addEventListener('click', function(e) {
             document.getElementById('bottom-nav').classList.remove('hidden-view');
             document.getElementById('btn-menu').classList.remove('hidden-view');
             document.getElementById('btn-back').classList.add('hidden-view');
-            
+
             // Clear container before loading to prevent duplicates
             const container = document.getElementById('bank-accounts-list');
             if (container) container.innerHTML = '';
-            
+
             loadDataForTab('wallet');
             return; // Prevent further execution
         } else if (appState.currentTab === 'wallet') {
@@ -1367,7 +1368,7 @@ document.getElementById('btn-back')?.addEventListener('click', function(e) {
             const target = appState.currentTab || 'stocks';
             window.switchTab(target, true);
         }
-    } 
+    }
     else {
         history.back();
     }
@@ -1375,32 +1376,32 @@ document.getElementById('btn-back')?.addEventListener('click', function(e) {
 
 
 // --- UPDATE CURRENT PRICE LOGIC ---
-window.openUpdatePriceModal = function(stockId, currentPrice) {
+window.openUpdatePriceModal = function (stockId, currentPrice) {
     appState.editingStockId = stockId;
     document.getElementById('updatePriceInput').value = currentPrice || '';
     window.openModal('modal-update-price');
 };
 
-window.saveCurrentPrice = async function() {
+window.saveCurrentPrice = async function () {
     const price = parseFloat(document.getElementById('updatePriceInput').value);
-    
+
     if (!price || price <= 0) {
         showNotification("Please enter a valid price", "error");
         return;
     }
-    
+
     const btn = document.querySelector('#modal-update-price .btn-save');
     setButtonLoading(btn, "Updating...");
-    
+
     try {
         const isMf = appState.currentTab === 'mfs';
         const { updateStockPrice } = await import('./services/stock-service.js');
         const { updateMFPrice } = await import('./services/mf-service.js');
-        
-        const success = isMf 
+
+        const success = isMf
             ? await updateMFPrice(appState.editingStockId, price)
             : await updateStockPrice(appState.editingStockId, price);
-        
+
         if (success) {
             showNotification("Price updated successfully", "success");
             window.closeModal('modal-update-price');
